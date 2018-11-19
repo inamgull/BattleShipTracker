@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using BattleShipTracker.Entities.Boards;
 using BattleShipTracker.Entities.Boards.Validators;
-using BattleShipTracker.Entities.Ships;
 using BattleShipTracker.Entities.Ships.Requests;
 
 namespace BattleShipTracker.Entities.Players
@@ -15,7 +12,6 @@ namespace BattleShipTracker.Entities.Players
         public string Name { get; }
         public PrimaryBoard PrimaryBoard { get; set; }
         public MarkingBoard MarkingBoard { get; set; }
-
 
         public bool HasLost() => PrimaryBoard.AllSunk();
 
