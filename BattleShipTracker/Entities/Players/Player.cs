@@ -15,9 +15,9 @@ namespace BattleShipTracker.Entities.Players
         public string Name { get; }
         public PrimaryBoard PrimaryBoard { get; set; }
         public MarkingBoard MarkingBoard { get; set; }
-        public IList<Ship> Ships { get; set; }
 
-        public bool HasLost() => Ships.All(x => x.IsSunk);
+
+        public bool HasLost() => PrimaryBoard.AllSunk();
 
         public Player(string name)
         {
@@ -25,7 +25,7 @@ namespace BattleShipTracker.Entities.Players
 
             PrimaryBoard = new PrimaryBoard();
             MarkingBoard = new MarkingBoard();
-            Ships = new List<Ship>();
+            
         }
 
         public bool AddShip(AddShipRequest request)
@@ -38,15 +38,9 @@ namespace BattleShipTracker.Entities.Players
                 throw new ArgumentException($"Invalid Argument Exception.{nameof(request)}");
             }
 
-            if (Ships.FirstOrDefault(x => x.ShipSquareStatus == request.Ship.ShipSquareStatus) != null)
-            {
-                return false;
-            }
+            
             //only add ship if it is not already on board and 
-            if (!PrimaryBoard.TryAddShip(request)) return false;
-            Ships.Add(request.Ship);
-            return true;
-
+            return PrimaryBoard.TryAddShip(request);
         }
 
         public AttackResult ProcessAttack(Coordinates coords)
@@ -59,11 +53,6 @@ namespace BattleShipTracker.Entities.Players
             }
 
             var result = PrimaryBoard.ProcessAttack(coords);
-            if (result.Item1 == AttackResult.Hit)
-            {
-                var ship = Ships.First(x => x.ShipSquareStatus == result.Item2.Status);
-                ship.IncrementHit();
-            }
 
             return result.Item1;
         }

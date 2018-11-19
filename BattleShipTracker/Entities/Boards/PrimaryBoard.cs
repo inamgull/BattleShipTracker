@@ -3,21 +3,33 @@ using BattleShipTracker.Entities.Ships;
 using BattleShipTracker.Entities.Ships.Requests;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BattleShipTracker.Entities.Boards
 {
     //Class for Primary board
     public class PrimaryBoard : Board
     {
+        private readonly IList<Ship> _ships;
         public PrimaryBoard()
         {
+            _ships = new List<Ship>();
+        }
 
+        public bool AllSunk()
+        {
+            return _ships.All(x => x.IsSunk);
         }
 
         public bool TryAddShip(AddShipRequest request)
         {
             lock (request)
             {
+                if (_ships.FirstOrDefault(x => x.ShipSquareStatus == request.Ship.ShipSquareStatus) != null)
+                {
+                    return false;
+                }
+
                 switch (request.Direction)
                 {
                     case ShipDirection.Horizental:
@@ -42,6 +54,10 @@ namespace BattleShipTracker.Entities.Boards
             if (square.Status != SquareStatus.Available)
             {
                 square.Hit = true;
+
+                var ship = _ships.First(x => x.ShipSquareStatus == square.Status);
+                ship.IncrementHit();
+
                 return new Tuple<AttackResult, Square>(AttackResult.Hit, square);
             }
 
@@ -60,6 +76,7 @@ namespace BattleShipTracker.Entities.Boards
                 Squares[i, request.Origin.Column].Status = request.Ship.ShipSquareStatus;
             }
 
+            _ships.Add(request.Ship);
             return true;
         }
 
@@ -74,6 +91,7 @@ namespace BattleShipTracker.Entities.Boards
                 Squares[request.Origin.Row, i].Status = request.Ship.ShipSquareStatus;
             }
 
+            _ships.Add(request.Ship);
             return true;
         }
 

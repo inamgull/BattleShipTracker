@@ -34,7 +34,6 @@ namespace BattleShipTracker.UnitTests
             //Assert
             Assert.NotNull(player.PrimaryBoard);
             Assert.NotNull(player.MarkingBoard);
-            Assert.NotNull(player.Ships);
 
         }
 
